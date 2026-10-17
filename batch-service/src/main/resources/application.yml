@@ -1,0 +1,10 @@
+app:
+  sqs:
+    enabled: false
+    queue-name: s3-rb-events
+
+spring:
+  cloud:
+    aws:
+      region:
+        static: ap-south-1
