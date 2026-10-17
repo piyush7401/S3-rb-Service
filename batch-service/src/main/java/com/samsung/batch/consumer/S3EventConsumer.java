@@ -1,15 +1,18 @@
 package com.samsung.batch.consumer;
 
-
+import com.samsung.batch.model.S3ObjectReference;
+import com.samsung.batch.parser.S3EventParser;
 import io.awspring.cloud.sqs.annotation.SqsListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
+import java.util.List;
+
 @Component
-@ConditionalOnProperty(name = "app.sqs.enabled" , havingValue = "true")
+@ConditionalOnProperty(name = "app.sqs.enabled", havingValue = "true")
 public class S3EventConsumer {
 
     private static final Logger log =

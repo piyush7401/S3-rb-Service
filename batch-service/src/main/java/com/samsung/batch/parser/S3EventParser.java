@@ -57,7 +57,7 @@ public class S3EventParser {
             }
 
             String objectKey = URLDecoder.decode(
-                    encodedKey,
+                    encodedKey.replace("+", "%2B"),
                     StandardCharsets.UTF_8
             );
 
