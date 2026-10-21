@@ -1,5 +1,6 @@
 package com.samsung.s3rb.handler;
 
+import com.samsung.s3rb.model.CacheKeyResponse;
 import com.samsung.s3rb.service.ProviderService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -23,6 +24,20 @@ public class S3RbHandler {
         return ServerResponse.ok()
                 .contentType(MediaType.TEXT_PLAIN)
                 .bodyValue("S3 RB Service is running");
+    }
+
+    public Mono<ServerResponse> getCacheKey(ServerRequest request) {
+
+        String providerId = request.queryParam("providerId")
+                .orElse("provider-101");
+
+        // Temporary static data
+        CacheKeyResponse response =
+                new CacheKeyResponse(providerId, "liveKey");
+
+        return ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(response);
     }
 
     public Mono<ServerResponse> getProvider(ServerRequest request) {

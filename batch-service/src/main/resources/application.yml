@@ -1,9 +1,15 @@
 app:
+  s3rb-service:
+    base-url: http://localhost:8080
+  s3:
+    mode: aws
   sqs:
-    enabled: false
-    queue-name: s3-rb-events
+    enabled: true
+    queue-name: https://sqs.ap-south-1.amazonaws.com/582377792951/s3-rb-events
 
 spring:
+  main:
+    web-application-type: none
   cloud:
     aws:
       region:

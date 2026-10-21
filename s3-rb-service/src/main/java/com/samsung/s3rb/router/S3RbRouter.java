@@ -16,6 +16,11 @@ public class S3RbRouter {
     @Bean
     public RouterFunction<ServerResponse> s3RbRoutes(S3RbHandler handler) {
         return route(GET("/ping"), handler::ping)
-                .andRoute(GET("/provider").and(accept(APPLICATION_JSON)), handler::getProvider);
+                .andRoute(GET("/provider").and(accept(APPLICATION_JSON)), handler::getProvider)
+                .andRoute(
+                        GET("/api/config/cache-key")
+                                .and(accept(APPLICATION_JSON)),
+                        handler::getCacheKey
+                );
     }
 }
