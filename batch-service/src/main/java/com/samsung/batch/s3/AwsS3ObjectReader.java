@@ -29,11 +29,28 @@ public class AwsS3ObjectReader implements S3ObjectReader {
             String bucketName,
             String objectKey
     ) {
+        return readObject(bucketName, objectKey, null);
+    }
+
+    @Override
+    public Mono<String> readObject(
+            String bucketName,
+            String objectKey,
+            String versionId
+    ) {
         return Mono.fromCallable(() -> {
-            GetObjectRequest request = GetObjectRequest.builder()
-                    .bucket(bucketName)
-                    .key(objectKey)
-                    .build();
+            GetObjectRequest.Builder requestBuilder =
+                    GetObjectRequest.builder()
+                            .bucket(bucketName)
+                            .key(objectKey);
+
+            if (versionId != null
+                    && !versionId.isBlank()
+                    && !"null".equals(versionId)) {
+                requestBuilder.versionId(versionId);
+            }
+
+            GetObjectRequest request = requestBuilder.build();
 
             try (ResponseInputStream<GetObjectResponse> response =
                          s3Client.getObject(request)) {

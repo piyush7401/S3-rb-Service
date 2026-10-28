@@ -19,23 +19,33 @@ public class ProviderProcessingRouter {
         // Existing dependencies ki assignments bhi preserve karna
     }
 
-    public void route(ProviderData providerData, String cacheKey) {
+    public void route(ProviderData providerData, String cacheKey, String sequencer) {
         CacheDestination destination =
                 CacheDestination.fromCacheKey(cacheKey);
 
         switch (destination) {
-            case LIVE -> processLive(providerData);
+            case LIVE -> processLive(providerData, sequencer);
             case NON_LIVE -> processNonLive(providerData);
         }
     }
 
-    private void processLive(ProviderData providerData) {
+    private void processLive(ProviderData providerData, String sequencer) {
         log.info(
-                "Routing provider to LIVE processing: providerId={}",
-                providerData.providerId()
+                "Routing provider to LIVE processing: providerId={}, sequencer={}",
+                providerData.providerId(),
+                sequencer
         );
 
-        versionedCacheService.publish(providerData);
+        boolean published =
+                versionedCacheService.publish(providerData, sequencer);
+
+        if (!published) {
+            log.info(
+                    "Ignoring stale or duplicate provider event: providerId={}",
+                    providerData.providerId()
+            );
+            return;
+        }
 
         log.info(
                 "Provider version published successfully: providerId={}",

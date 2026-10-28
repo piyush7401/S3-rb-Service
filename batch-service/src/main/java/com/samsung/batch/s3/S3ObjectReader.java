@@ -7,4 +7,10 @@ public interface S3ObjectReader {
             String bucketName,
             String objectKey
     );
+
+    Mono<String> readObject(
+            String bucketName,
+            String objectKey,
+            String versionId
+    );
 }

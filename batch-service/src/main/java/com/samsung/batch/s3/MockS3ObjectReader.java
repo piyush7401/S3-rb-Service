@@ -12,10 +12,20 @@ import reactor.core.publisher.Mono;
         matchIfMissing = true
 )
 public class MockS3ObjectReader implements S3ObjectReader {
+
     @Override
     public Mono<String> readObject(
             String bucketName,
             String objectKey
+    ) {
+        return readObject(bucketName, objectKey, null);
+    }
+
+    @Override
+    public Mono<String> readObject(
+            String bucketName,
+            String objectKey,
+            String versionId
     ) {
         String mockJson = """
                 {

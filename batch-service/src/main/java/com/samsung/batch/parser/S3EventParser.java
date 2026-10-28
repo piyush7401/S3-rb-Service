@@ -44,11 +44,11 @@ public class S3EventParser {
             }
 
             JsonNode s3 = record.path("s3");
-            String bucketName =
-                    s3.path("bucket").path("name").asText("");
+            JsonNode bucket = s3.path("bucket");
+            JsonNode object = s3.path("object");
 
-            String encodedKey =
-                    s3.path("object").path("key").asText("");
+            String bucketName = bucket.path("name").asText("");
+            String encodedKey = object.path("key").asText("");
 
             if (bucketName.isBlank() || encodedKey.isBlank()) {
                 throw new IllegalArgumentException(
@@ -61,8 +61,16 @@ public class S3EventParser {
                     StandardCharsets.UTF_8
             );
 
+            String versionId = object.path("versionId").asText(null);
+            String sequencer = object.path("sequencer").asText(null);
+
             references.add(
-                    new S3ObjectReference(bucketName, objectKey)
+                    new S3ObjectReference(
+                            bucketName,
+                            objectKey,
+                            versionId,
+                            sequencer
+                    )
             );
         }
 

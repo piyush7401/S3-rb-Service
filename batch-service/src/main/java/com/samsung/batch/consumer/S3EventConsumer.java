@@ -87,7 +87,7 @@ public class S3EventConsumer {
                     bucketName, objectKey);
 
             String rawJson = s3ObjectReader
-                    .readObject(bucketName, objectKey)
+                    .readObject(bucketName, objectKey, reference.versionId())
                     .doOnError(error ->
                             log.error(
                                     "Failed to read S3 object: bucket={}, key={}",
@@ -104,7 +104,7 @@ public class S3EventConsumer {
             ProviderData providerData = transformer.transform(rawJson);
             CacheKeyResponse cacheKeyResponse = cacheKeyClient.getCacheKey(providerData.providerId());
             String cacheKey = cacheKeyResponse.cacheKey();
-            processingRouter.route(providerData, cacheKey);
+            processingRouter.route(providerData, cacheKey, reference.sequencer());
 
             log.info(
                     "Provider processed: id={}, name={}, games={}, cacheKey={}",
