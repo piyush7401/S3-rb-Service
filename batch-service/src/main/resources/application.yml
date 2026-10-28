@@ -10,6 +10,12 @@ app:
 spring:
   main:
     web-application-type: none
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      connect-timeout: 2s
+      timeout: 2s
   cloud:
     aws:
       region:

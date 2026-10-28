@@ -5,6 +5,7 @@ import com.samsung.batch.model.S3ObjectReference;
 import com.samsung.batch.model.ProviderData;
 import com.samsung.batch.parser.S3EventParser;
 import com.samsung.batch.s3.S3ObjectReader;
+import com.samsung.batch.service.ProviderProcessingRouter;
 import com.samsung.batch.transformer.ProviderDataTransformer;
 import com.samsung.batch.service.CacheKeyClient;
 import com.samsung.batch.model.CacheKeyResponse;
@@ -31,17 +32,19 @@ public class S3EventConsumer {
     private final S3ObjectReader s3ObjectReader;
     private final ProviderDataTransformer transformer;
     private final CacheKeyClient cacheKeyClient;
+    private final ProviderProcessingRouter processingRouter;
 
     public S3EventConsumer(
             S3EventParser s3EventParser,
             S3ObjectReader s3ObjectReader,
             ProviderDataTransformer transformer,
-            CacheKeyClient cacheKeyClient
+            CacheKeyClient cacheKeyClient, ProviderProcessingRouter processingRouter
     ) {
         this.s3EventParser = s3EventParser;
         this.s3ObjectReader = s3ObjectReader;
         this.transformer = transformer;
         this.cacheKeyClient = cacheKeyClient;
+        this.processingRouter = processingRouter;
     }
 
     @SqsListener("${app.sqs.queue-name}")
@@ -99,11 +102,9 @@ public class S3EventConsumer {
             }
 
             ProviderData providerData = transformer.transform(rawJson);
-
-            CacheKeyResponse cacheKeyResponse =
-                    cacheKeyClient.getCacheKey(providerData.providerId());
-
+            CacheKeyResponse cacheKeyResponse = cacheKeyClient.getCacheKey(providerData.providerId());
             String cacheKey = cacheKeyResponse.cacheKey();
+            processingRouter.route(providerData, cacheKey);
 
             log.info(
                     "Provider processed: id={}, name={}, games={}, cacheKey={}",
@@ -112,17 +113,10 @@ public class S3EventConsumer {
                     providerData.games() == null
                             ? 0
                             : providerData.games().size(),
-                    cacheKey
+                    cacheKeyResponse.cacheKey()
             );
 
-            log.info(
-                    "Provider processed: id={}, name={}, games={}",
-                    providerData.providerId(),
-                    providerData.name(),
-                    providerData.games() == null
-                            ? 0
-                            : providerData.games().size()
-            );
+
         }
     }
 }

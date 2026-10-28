@@ -6,7 +6,7 @@ public enum CacheDestination {
     LIVE,
     NON_LIVE;
 
-    public static CacheDestination from(String cacheKey) {
+    public static CacheDestination fromCacheKey(String cacheKey) {
         if (Key.LIVEKEY.equals(cacheKey)) {
             return LIVE;
         }
